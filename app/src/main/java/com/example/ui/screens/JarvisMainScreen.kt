@@ -84,6 +84,7 @@ fun JarvisMainScreen(
     val suitTelemetry by viewModel.suitTelemetry.collectAsState()
     val isExecuting by viewModel.isExecuting.collectAsState()
     val isVoiceMuted by viewModel.isVoiceMuted.collectAsState()
+    val isHandsFreeActive by viewModel.isHandsFreeActive.collectAsState()
     val selectedTab by viewModel.selectedTab.collectAsState()
     val audioWaveform by viewModel.audioWaveform.collectAsState()
 
@@ -109,6 +110,8 @@ fun JarvisMainScreen(
             JarvisTopHudBar(
                 isVoiceMuted = isVoiceMuted,
                 onToggleVoiceMute = { viewModel.toggleVoiceMute() },
+                isHandsFreeActive = isHandsFreeActive,
+                onToggleHandsFree = { viewModel.toggleHandsFreeVoice() },
                 isCombatMode = suitTelemetry.isCombatMode
             )
 
@@ -147,7 +150,9 @@ fun JarvisMainScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            onVoiceToggle = { viewModel.triggerEyeDiagnostic() }
+                            onVoiceToggle = { viewModel.triggerEyeDiagnostic() },
+                            isHandsFreeActive = isHandsFreeActive,
+                            onToggleHandsFree = { viewModel.toggleHandsFreeVoice() }
                         )
                     }
 
@@ -188,6 +193,8 @@ fun JarvisMainScreen(
 private fun JarvisTopHudBar(
     isVoiceMuted: Boolean,
     onToggleVoiceMute: () -> Unit,
+    isHandsFreeActive: Boolean,
+    onToggleHandsFree: () -> Unit,
     isCombatMode: Boolean
 ) {
     Row(
@@ -231,6 +238,24 @@ private fun JarvisTopHudBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Hands-Free Mic Button
+            IconButton(
+                onClick = onToggleHandsFree,
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(if (isHandsFreeActive) TechGreen.copy(alpha = 0.3f) else HoloSurfaceVariant)
+                    .border(1.dp, if (isHandsFreeActive) TechGreen else HoloCardBorder, CircleShape)
+                    .testTag("hands_free_voice_toggle_btn")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Mic,
+                    contentDescription = "Hands-Free Voice",
+                    tint = if (isHandsFreeActive) TechGreen else HoloCyan,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+
             IconButton(
                 onClick = onToggleVoiceMute,
                 modifier = Modifier

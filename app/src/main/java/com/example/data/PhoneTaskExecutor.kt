@@ -3,6 +3,7 @@ package com.example.data
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.AlarmClock
 import android.provider.MediaStore
 import android.provider.Settings
 
@@ -12,6 +13,17 @@ object PhoneTaskExecutor {
         val intent: Intent? = when {
             lower.contains("camera") || lower.contains("photo") || lower.contains("picture") -> {
                 Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            }
+            lower.contains("alarm") || lower.contains("set alarm") -> {
+                Intent(AlarmClock.ACTION_SET_ALARM).apply {
+                    putExtra(AlarmClock.EXTRA_MESSAGE, "J.A.R.V.I.S. Alarm")
+                    putExtra(AlarmClock.EXTRA_HOUR, 7)
+                    putExtra(AlarmClock.EXTRA_MINUTES, 0)
+                    putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+                }
+            }
+            lower.contains("youtube") || lower.contains("open youtube") -> {
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com"))
             }
             lower.contains("browser") || lower.contains("google") || lower.contains("internet") || lower.contains("web") -> {
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
@@ -65,7 +77,14 @@ object PhoneTaskExecutor {
                 val appName = lower.removePrefix("open ").removePrefix("launch ").trim()
                 try {
                     val pm = context.packageManager
-                    val launchIntent = pm.getLaunchIntentForPackage(appName)
+                    val pkgName = when {
+                        appName.contains("youtube") -> "com.google.android.youtube"
+                        appName.contains("whatsapp") -> "com.whatsapp"
+                        appName.contains("maps") -> "com.google.android.apps.maps"
+                        appName.contains("chrome") -> "com.android.chrome"
+                        else -> appName
+                    }
+                    val launchIntent = pm.getLaunchIntentForPackage(pkgName)
                     if (launchIntent != null) {
                         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         context.startActivity(launchIntent)

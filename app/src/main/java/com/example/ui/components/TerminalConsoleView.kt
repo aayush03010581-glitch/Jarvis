@@ -85,7 +85,9 @@ fun TerminalConsoleView(
     commandHistory: List<String>,
     isExecuting: Boolean = false,
     modifier: Modifier = Modifier,
-    onVoiceToggle: () -> Unit = {}
+    onVoiceToggle: () -> Unit = {},
+    isHandsFreeActive: Boolean = false,
+    onToggleHandsFree: () -> Unit = {}
 ) {
     var inputText by remember { mutableStateOf("") }
     var historyIndex by remember { mutableIntStateOf(-1) }
@@ -382,6 +384,26 @@ fun TerminalConsoleView(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Execute Command",
                     tint = HoloBgDark,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            // Hands-Free Voice Command Button
+            IconButton(
+                onClick = onToggleHandsFree,
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (isHandsFreeActive) TechGreen.copy(alpha = 0.3f) else HoloSurfaceVariant)
+                    .border(1.dp, if (isHandsFreeActive) TechGreen else HoloCardBorder, RoundedCornerShape(8.dp))
+                    .testTag("terminal_hands_free_mic_btn")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Mic,
+                    contentDescription = "Hands-Free Voice Command",
+                    tint = if (isHandsFreeActive) TechGreen else HoloCyan,
                     modifier = Modifier.size(20.dp)
                 )
             }
