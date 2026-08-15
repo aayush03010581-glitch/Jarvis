@@ -36,14 +36,15 @@ class JarvisVoiceManager(context: Context) {
                 isTtsInitialized = true
                 // Attempt UK English first for authentic Jarvis tone, otherwise US or default
                 val ukLocale = Locale.UK
-                if (tts?.isLanguageAvailable(ukLocale) == TextToSpeech.LANG_AVAILABLE) {
+                if (tts?.isLanguageAvailable(ukLocale) == TextToSpeech.LANG_AVAILABLE || 
+                    tts?.isLanguageAvailable(ukLocale) == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
                     tts?.language = ukLocale
                 } else {
-                    tts?.language = Locale.getDefault()
+                    tts?.language = Locale.US
                 }
-                // Slightly deeper pitch and steady sophisticated rate
-                tts?.setPitch(0.92f)
-                tts?.setSpeechRate(0.98f)
+                // Refined Jarvis voice profile: deeper authoritative pitch and measured aristocratic cadence
+                tts?.setPitch(0.88f)
+                tts?.setSpeechRate(0.94f)
 
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {
