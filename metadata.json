@@ -1,0 +1,6 @@
+{
+  "name": "JARVIS",
+  "description": "Iron Man inspired AI assistant with holographic Arc Reactor Eye and cyber terminal command execution.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

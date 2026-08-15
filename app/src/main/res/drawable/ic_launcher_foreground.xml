@@ -1,0 +1,56 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Arc segments -->
+    <path
+        android:pathData="M54,24 A30,30 0 0,1 84,54"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#00E5FF" />
+    <path
+        android:pathData="M84,54 A30,30 0 0,1 54,84"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#00B0FF" />
+    <path
+        android:pathData="M54,84 A30,30 0 0,1 24,54"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#00E5FF" />
+    <path
+        android:pathData="M24,54 A30,30 0 0,1 54,24"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#00B0FF" />
+
+    <!-- Tech Ring with tick marks -->
+    <path
+        android:pathData="M54,32 A22,22 0 1,1 53.99,32"
+        android:strokeWidth="1.5"
+        android:strokeColor="#80D8FF" />
+
+    <!-- 8 Reactor Coils / Radial Ticks -->
+    <path
+        android:pathData="M54,33 L54,39 M54,69 L54,75 M33,54 L39,54 M69,54 L75,54 M39,39 L44,44 M69,69 L64,64 M69,39 L64,44 M39,69 L44,64"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeColor="#FFD700" />
+
+    <!-- Inner Eye Reticle Ring -->
+    <path
+        android:pathData="M54,41 A13,13 0 1,1 53.99,41"
+        android:strokeWidth="2"
+        android:strokeColor="#00E5FF" />
+
+    <!-- Glowing Eye Center Core -->
+    <path
+        android:pathData="M54,46 A8,8 0 1,1 53.99,46"
+        android:fillColor="#E0F7FA" />
+
+    <!-- Center Pupil Point -->
+    <path
+        android:pathData="M54,51 A3,3 0 1,1 53.99,51"
+        android:fillColor="#00B0FF" />
+</vector>
