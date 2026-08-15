@@ -20,6 +20,8 @@ import java.util.Collections
 import java.util.Date
 import java.util.Locale
 import kotlin.random.Random
+import com.example.data.PhoneTaskExecutor
+import com.example.data.LocationWeatherManager
 
 class TerminalEngine(private val context: Context) {
 
@@ -53,36 +55,31 @@ class TerminalEngine(private val context: Context) {
         val args = parts.drop(1)
 
         when (command) {
-            "visa", "student_visa", "f1", "study" -> {
-                val sub = args.firstOrNull()?.lowercase(Locale.ROOT) ?: "overview"
-                when (sub) {
-                    "checklist", "docs" -> {
-                        lines.add(TerminalLine(type = LineType.HEADER, text = "=== STUDENT VISA (F-1 / TIER 4 / SCHENGEN) DOCUMENT CHECKLIST ==="))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] Form I-20 / CAS Statement from Accredited Institution"))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] Valid International Passport (valid at least 6 months)"))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] DS-160 / Visa Application Confirmation & Barcode"))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] SEVIS I-901 Fee Receipt ($350 for US F-1)"))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] Standardized Test Scores (TOEFL/IELTS/GRE/GMAT)"))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] Academic Transcripts, Degrees & Certificates"))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "DOC", text = "[✓] Bank Statements & Affidavit of Financial Support (1-2 years proof)"))
-                        onSpeak("Student visa document checklist displayed. All items catalogued, Sir.")
-                    }
-                    "interview" -> {
-                        lines.add(TerminalLine(type = LineType.HEADER, text = "=== CONSULAR VISA INTERVIEW PROTOCOLS ==="))
-                        lines.add(TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "Q1", text = "Why this university? -> State specific faculty, labs, curriculum."))
-                        lines.add(TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "Q2", text = "Who is sponsoring your education? -> Explain liquid funds & family income clearly."))
-                        lines.add(TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "Q3", text = "Post-graduation plans? -> Emphasize intent to return to home country with career goals."))
-                        onSpeak("Interview preparation subroutines initialized, Sir.")
-                    }
-                    else -> {
-                        lines.add(TerminalLine(type = LineType.HEADER, text = "=== INTERNATIONAL STUDENT VISA ADVISORY ==="))
-                        lines.add(TerminalLine(type = LineType.SUCCESS, tag = "VISA", text = "Comprehensive visa protocols active. Use commands:"))
-                        lines.add(TerminalLine(type = LineType.OUTPUT, text = "  • visa checklist - Step-by-step document requirements"))
-                        lines.add(TerminalLine(type = LineType.OUTPUT, text = "  • visa interview - Consular interview questions & strategic answers"))
-                        lines.add(TerminalLine(type = LineType.OUTPUT, text = "  • Or type any question: \"How to prepare for my F-1 visa interview?\""))
-                        onSpeak("Student visa advisory protocols online. Standing by for questions, Sir.")
-                    }
+            "open", "launch", "camera", "browser", "settings", "maps", "dial", "call", "calculator", "app" -> {
+                val taskQuery = if (command in listOf("open", "launch", "app")) args.joinToString(" ") else trimmed
+                val success = PhoneTaskExecutor.executeTask(context, taskQuery.ifBlank { command })
+                if (success) {
+                    lines.add(TerminalLine(type = LineType.SUCCESS, tag = "TASK", text = "Phone task executed successfully: '$taskQuery'"))
+                    onSpeak("Executing requested phone operation, Sir.")
+                } else {
+                    lines.add(TerminalLine(type = LineType.WARNING, tag = "TASK", text = "Unable to launch requested application or device task."))
+                    onSpeak("I encountered an issue executing that device operation, Sir.")
                 }
+            }
+
+            "weather", "forecast", "temperature" -> {
+                lines.add(TerminalLine(type = LineType.SYSTEM, tag = "GPS", text = "Acquiring satellite GPS fix and meteorological telemetry..."))
+                val weatherReport = LocationWeatherManager(context).getCurrentWeatherReport()
+                lines.add(TerminalLine(type = LineType.JARVIS, tag = "JARVIS", text = weatherReport))
+                onSpeak(weatherReport)
+            }
+
+            "stick", "stick_mode", "stick mode", "stealth", "combat" -> {
+                onTelemetryUpdate(currentTelemetry.copy(isCombatMode = true, suitIntegrity = 100))
+                lines.add(TerminalLine(type = LineType.SUCCESS, tag = "STICK_MODE", text = "=== PROTOCOL STICK / COMBAT MODE ENGAGED ==="))
+                lines.add(TerminalLine(type = LineType.SUCCESS, tag = "TACTICAL", text = "Repulsor cannons online, targeting matrix active, nanotech lattice reinforced."))
+                val msg = "Stick mode engaged, Sir. Advanced tactical countermeasures and high-frequency sensor arrays online."
+                onSpeak(msg)
             }
 
             "help", "man", "?" -> {
@@ -204,7 +201,9 @@ class TerminalEngine(private val context: Context) {
             TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "PROTO", text = "protocol <name>   - Execute Stark defense protocol (veronica, house_party, clean_slate, sentry, nano_repair)"),
             TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "NET", text = "ping <host>       - Real socket latency test to network destination"),
             TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "NET", text = "wifi / ip         - Network adapter telemetry & IP routing"),
-            TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "AUDIO", text = "speak <text>      - Verbalize directive via Jarvis speech synthesis"),
+            TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "TASK", text = "open <app / task>  - Execute phone operations (camera, browser, settings, maps, dial, etc.)"),
+            TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "GPS", text = "weather           - Real-time GPS location weather & meteorological telemetry"),
+            TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "TACTICAL", text = "stick mode        - Activate Protocol Stick / Combat Mode countermeasures"),
             TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "AI", text = "ai <prompt>       - Direct query to Gemini intelligence cortex"),
             TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "UTIL", text = "date / uptime     - Chronometer & system operational duration"),
             TerminalLine(type = LineType.STARK_DIRECTIVE, tag = "UTIL", text = "history / clear   - Shell log management"),
