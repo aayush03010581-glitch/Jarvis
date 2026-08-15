@@ -137,6 +137,21 @@ class JarvisViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun toggleCombatMode() {
+        val current = _suitTelemetry.value.isCombatMode
+        val newMode = !current
+        _suitTelemetry.value = _suitTelemetry.value.copy(
+            isCombatMode = newMode,
+            activeProtocol = if (newMode) "STRICT RED ALERT" else "STANDBY"
+        )
+        _eyeState.value = if (newMode) EyeState.COMBAT else EyeState.IDLE
+        if (newMode) {
+            voiceManager.speak("Strict Mode activated. Protocol Red engaged. All systems locked in red alert.")
+        } else {
+            voiceManager.speak("Strict Mode disengaged. Returning to standard operations.")
+        }
+    }
+
     fun getCommandHistory(): List<String> = terminalEngine.getCommandHistory()
 
     fun executeTerminalCommand(input: String) {

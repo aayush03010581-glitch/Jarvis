@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.automirrored.filled.VolumeMute
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.Icon
@@ -88,11 +89,13 @@ fun JarvisMainScreen(
     val selectedTab by viewModel.selectedTab.collectAsState()
     val audioWaveform by viewModel.audioWaveform.collectAsState()
 
+    val appBg = if (suitTelemetry.isCombatMode) Color(0xFF140205) else HoloBgDark
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .background(HoloBgDark),
-        containerColor = HoloBgDark,
+            .background(appBg),
+        containerColor = appBg,
         bottomBar = {
             JarvisBottomNavBar(
                 selectedTab = selectedTab,
@@ -112,7 +115,8 @@ fun JarvisMainScreen(
                 onToggleVoiceMute = { viewModel.toggleVoiceMute() },
                 isHandsFreeActive = isHandsFreeActive,
                 onToggleHandsFree = { viewModel.toggleHandsFreeVoice() },
-                isCombatMode = suitTelemetry.isCombatMode
+                isCombatMode = suitTelemetry.isCombatMode,
+                onToggleCombatMode = { viewModel.toggleCombatMode() }
             )
 
             // Dynamic Main Tab View
@@ -195,13 +199,17 @@ private fun JarvisTopHudBar(
     onToggleVoiceMute: () -> Unit,
     isHandsFreeActive: Boolean,
     onToggleHandsFree: () -> Unit,
-    isCombatMode: Boolean
+    isCombatMode: Boolean,
+    onToggleCombatMode: () -> Unit
 ) {
+    val topBarBg = if (isCombatMode) Color(0xFF26050A) else HoloSurfaceDark
+    val topBarBorder = if (isCombatMode) AlertRed else HoloCardBorder
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(HoloSurfaceDark)
-            .border(1.dp, HoloCardBorder)
+            .background(topBarBg)
+            .border(1.dp, topBarBorder)
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -218,16 +226,16 @@ private fun JarvisTopHudBar(
             )
             Column {
                 Text(
-                    text = "J.A.R.V.I.S. // MARK LXXXV",
-                    color = HoloCyanBright,
+                    text = if (isCombatMode) "PROTOCOL RED // STRICT" else "J.A.R.V.I.S. // MARK LXXXV",
+                    color = if (isCombatMode) AlertRed else HoloCyanBright,
                     fontSize = 13.sp,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
                 Text(
-                    text = "STARK INDUSTRIES SECURE OS",
-                    color = HoloTextMuted,
+                    text = if (isCombatMode) "CRITICAL COMBAT ALERT" else "STARK INDUSTRIES SECURE OS",
+                    color = if (isCombatMode) AlertRed.copy(alpha = 0.8f) else HoloTextMuted,
                     fontSize = 9.sp,
                     fontFamily = FontFamily.Monospace
                 )
@@ -238,6 +246,24 @@ private fun JarvisTopHudBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Strict Mode / Protocol Red Toggle Button
+            IconButton(
+                onClick = onToggleCombatMode,
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(if (isCombatMode) AlertRed else HoloSurfaceVariant)
+                    .border(1.dp, if (isCombatMode) Color.White else HoloCardBorder, CircleShape)
+                    .testTag("strict_mode_toggle_btn")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = "Strict Mode Red Alert",
+                    tint = if (isCombatMode) Color.White else AlertRed,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+
             // Hands-Free Mic Button
             IconButton(
                 onClick = onToggleHandsFree,

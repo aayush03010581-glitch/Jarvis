@@ -74,11 +74,12 @@ class TerminalEngine(private val context: Context) {
                 onSpeak(weatherReport)
             }
 
-            "stick", "stick_mode", "stick mode", "stealth", "combat" -> {
-                onTelemetryUpdate(currentTelemetry.copy(isCombatMode = true, suitIntegrity = 100))
-                lines.add(TerminalLine(type = LineType.SUCCESS, tag = "STICK_MODE", text = "=== PROTOCOL STICK / COMBAT MODE ENGAGED ==="))
-                lines.add(TerminalLine(type = LineType.SUCCESS, tag = "TACTICAL", text = "Repulsor cannons online, targeting matrix active, nanotech lattice reinforced."))
-                val msg = "Stick mode engaged, Sir. Advanced tactical countermeasures and high-frequency sensor arrays online."
+            "stick", "stick_mode", "stick mode", "stealth", "combat", "strict", "strict mode", "strict_mode", "red", "protocol red", "protocol_red" -> {
+                val newCombat = !currentTelemetry.isCombatMode
+                onTelemetryUpdate(currentTelemetry.copy(isCombatMode = newCombat, activeProtocol = if (newCombat) "STRICT RED ALERT" else "STANDBY", suitIntegrity = 100))
+                lines.add(TerminalLine(type = LineType.ERROR, tag = "STRICT_MODE", text = if (newCombat) "=== STRICT MODE / PROTOCOL RED ENGAGED: ALL SYSTEMS RED ALERT ===" else "=== STRICT MODE DISENGAGED ==="))
+                lines.add(TerminalLine(type = LineType.SUCCESS, tag = "TACTICAL", text = if (newCombat) "All holographic HUD, eye telemetry, and terminal streams locked in strict crimson red alert." else "Returning to standard Holo Cyan matrix."))
+                val msg = if (newCombat) "Strict mode engaged, Sir. Protocol Red active. All systems locked in red alert." else "Strict mode disengaged."
                 onSpeak(msg)
             }
 
